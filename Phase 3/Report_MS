@@ -1,0 +1,79 @@
+
+<body>
+    <div id="main_container">
+        <div id="header">
+            <div class="logo">
+                <img src="img/ERMSlogo.gif" style="opacity:0.5;background-color:E9E5E2;" border="0" alt="" title="ERMS Logo"/>
+            </div>
+        </div>
+	</div>
+	<br></br>
+</body>
+
+
+
+
+<?php
+include('dbConnect.php');
+if (!isset($_SESSION['username'])) {
+	header('Location: login.php');
+	exit();
+}
+
+echo "<h2>Resource Report</h2>";
+
+
+
+$query = "SELECT a.primary_ESF_number, b.ESF_description, sum(CASE WHEN a.resource_owner='$_SESSION[username]' THEN 1 ELSE 0 END) as 'Total Resources', sum(CASE WHEN a.resource_owner='$_SESSION[username]' and a.status <> 'Available' THEN 1 ELSE 0 END) as 'Resources in Use'    FROM ERMSResource as a left join dimESF as B on a.primary_ESF_number = b.ESF_number";
+ 
+$result = mysqli_query($db, $query);
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+
+$i = 0;
+echo '<html><body><table><tr>';
+while ($i < mysql_num_fields($result))
+{
+    $meta = mysql_fetch_field($result, $i);
+    echo '<td>' . $meta->name . '</td>';
+    $i = $i + 1;
+}
+echo '</tr>';
+
+$i = 0;
+while ($row = mysql_fetch_row($result)) 
+{
+    echo '<tr>';
+    $count = count($row);
+    $y = 0;
+    while ($y < $count)
+    {
+        $c_row = current($row);
+        echo '<td>' . $c_row . '</td>';
+        next($row);
+        $y = $y + 1;
+    }
+    echo '</tr>';
+    $i = $i + 1;
+}
+echo '</table></body></html>';
+mysql_free_result($result);
+
+echo "<br></br>";
+
+
+$conn->close();
+ 
+
+
+// Will not necessarily keep links to all other pages, but at least for the dev part it is useful for me
+echo "<b>Links</b>";
+	echo "<li> <a href='MainMenu.php'>Main Menu</a> </li>";
+	echo "<li> <a href='AddResource.php'>Add Resource</a> </li>";
+	echo "<li> <a href='AddIncident.php'>Add Emergency Incident	</a> </li>";
+	echo "<li> <a href='SearchResources.php'>Search Resources</a> </li>";
+	//echo "<li> <a href='ResourceStatus.php'>Resource Status</a> </li>";
+	echo "<li> <a href='ResourceReport.php'>Resource Report</a> </li>";
+	echo "<li> <a href='LogOut.php'>LogOut</a> </li>";
+	
+ ?>

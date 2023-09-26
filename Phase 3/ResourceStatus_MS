@@ -1,0 +1,153 @@
+
+<body>
+    <div id="main_container">
+        <div id="header">
+            <div class="logo">
+                <img src="img/ERMSlogo.gif" style="opacity:0.5;background-color:E9E5E2;" border="0" alt="" title="ERMS Logo"/>
+            </div>
+        </div>
+	</div>
+	<br></br>
+</body>
+
+
+<?php
+include('dbConnect.php');
+if (!isset($_SESSION['username'])) {
+	header('Location: login.php');
+	exit();
+}
+
+
+//Can we just use incident type or should we use incident_type_long from the incident table? 
+$query = "SELECT a.resource_id , a.resource_name , a.incident_type, a.resource_owner, a.request_start_date, a.exp_return_date FROM Request as a WHERE a.resource_owner='$_SESSION[username]'";
+ 
+$result = mysqli_query($db, $query);
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+echo "<h2>Resource Status</h2>";
+echo "<h3>Resources In Use</h3>";
+
+$i = 0;
+echo '<html><body><table><tr>';
+while ($i < mysql_num_fields($result))
+{
+    $meta = mysql_fetch_field($result, $i);
+    echo '<td>' . $meta->name . '</td>';
+    $i = $i + 1;
+}
+echo '</tr>';
+
+$i = 0;
+while ($row = mysql_fetch_row($result)) 
+{
+    echo '<tr>';
+    $count = count($row);
+    $y = 0;
+    while ($y < $count)
+    {
+        $c_row = current($row);
+        echo '<td>' . $c_row . '</td>';
+        next($row);
+        $y = $y + 1;
+    }
+    echo '</tr>';
+    $i = $i + 1;
+}
+echo '</table></body></html>';
+mysql_free_result($result);
+
+echo "<br></br>";
+
+echo "<h3>Resources Requested by me</h3>";
+
+$query = "SELECT a.resource_id , a.resource_name , a.incident_type, a.resource_owner, a.exp_return_date FROM Request as a  WHERE a.resource_owner='$_SESSION[username]' and a.date_request_accepted is null";
+
+$result = mysqli_query($db, $query);
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+
+$i = 0;
+echo '<html><body><table><tr>';
+while ($i < mysql_num_fields($result))
+{
+   $meta = mysql_fetch_field($result, $i);
+   echo '<td>' . $meta->name . '</td>';
+   $i = $i + 1;
+}
+echo '</tr>';
+
+$i = 0;
+while ($row = mysql_fetch_row($result)) 
+{
+   echo '<tr>';
+   $count = count($row);
+   $y = 0;
+   while ($y < $count)
+   {
+       $c_row = current($row);
+       echo '<td>' . $c_row . '</td>';
+       next($row);
+       $y = $y + 1;
+   }
+   echo '</tr>';
+   $i = $i + 1;
+}
+echo '</table></body></html>';
+mysql_free_result($result);
+
+echo "<br></br>";
+
+echo "<h3>Resource Requests Received by Me</h3>";
+
+$query = "SELECT a.resource_id , a.resource_name , a.incident_type, a.resource_owner, a.exp_return_date FROM Request as a  WHERE a.incident_owner='$_SESSION[username]' and a.date_request_accepted is null";
+
+$result = mysqli_query($db, $query);
+$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+
+$i = 0;
+echo '<html><body><table><tr>';
+while ($i < mysql_num_fields($result))
+{
+   $meta = mysql_fetch_field($result, $i);
+   echo '<td>' . $meta->name . '</td>';
+   $i = $i + 1;
+}
+echo '</tr>';
+
+$i = 0;
+while ($row = mysql_fetch_row($result)) 
+{
+   echo '<tr>';
+   $count = count($row);
+   $y = 0;
+   while ($y < $count)
+   {
+       $c_row = current($row);
+       echo '<td>' . $c_row . '</td>';
+       next($row);
+       $y = $y + 1;
+   }
+   echo '</tr>';
+   $i = $i + 1;
+}
+echo '</table></body></html>';
+mysql_free_result($result);
+
+
+$conn->close();
+ 
+
+
+// Will not necessarily keep links to all other pages, but at least for the dev part it is useful for me
+echo "<b>Links</b>";
+	echo "<li> <a href='MainMenu.php'>Main Menu</a> </li>";
+	echo "<li> <a href='AddResource.php'>Add Resource</a> </li>";
+	echo "<li> <a href='AddIncident.php'>Add Emergency Incident	</a> </li>";
+	echo "<li> <a href='SearchResources.php'>Search Resources</a> </li>";
+	//echo "<li> <a href='ResourceStatus.php'>Resource Status</a> </li>";
+	echo "<li> <a href='ResourceReport.php'>Resource Report</a> </li>";
+	echo "<li> <a href='LogOut.php'>LogOut</a> </li>";
+	
+ ?>
